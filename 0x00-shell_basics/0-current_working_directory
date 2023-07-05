@@ -1,1 +1,4 @@
-/root/alx-system_engineering-devops
+#My current working directory
+
+#!/bin/bash
+pwd
