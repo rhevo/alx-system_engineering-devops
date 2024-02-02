@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # Displays all active IPV4 addresses on the machine
 
 ifconfig | grep -oP 'inet \K\S+'
