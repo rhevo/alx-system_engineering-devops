@@ -1,27 +1,40 @@
 server {
     listen 80;
     listen [::]:80 default_server;
-    add_header X-Served-By $hostname;
-    root   /etc/nginx/html;
-    index  index.html index.htm;
-    location /redirect_me {
-        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
-    }
+
+    # Add a header to indicate which server handled the request
+    add_header X-served-by $hostname;
+
+    # Correct the root directive path and ensure it is consistent
     root /var/www/html;
 
-    server_name _;
+    # Specify the default files to serve
+    index index.html index.htm;
 
-    location /airbnb-onepage {
-        proxy_pass http://0.0.0.0:5000/airbnb-onepage;
+    # Redirect /redirect_me to YouTube
+    location /redirect_me {
+        return 301 https://www.youtube.com;
     }
 
+    # Proxy pass configuration for /airbnb-onepage
+    location /airbnb-onepage {
+        proxy_pass http://127.0.0.1:5000;  # Corrected proxy_pass URL
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Alias for static content at /hbnb_static
     location /hbnb_static {
         alias /data/web_static/current/;
     }
 
-    location /{
-        # First attempt to serve request as file, then
-        # as directory, then fall back to displaying a 404.
+    # Default location block for serving static files or returning 404
+    location / {
         try_files $uri $uri/ =404;
-     }
+    }
+
+    # Default server_name to catch all
+    server_name _;
 }
